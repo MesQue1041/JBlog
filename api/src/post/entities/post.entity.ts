@@ -1,1 +1,25 @@
-export class Post {}
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+
+@Entity('posts')
+export class Post {
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
+    title: string;
+
+    @Column()
+    content: string;
+
+    @Column()
+    slug: string;
+
+    @Column({type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
+    createdOn: Date;
+
+    @Column({type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
+    modiefiedOn: Date;
+
+    @Column()
+    mainImageUrl: string;
+}
