@@ -12,8 +12,9 @@ export class PostService {
 
   }
 
-  create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+  async create(createPostDto: CreatePostDto) {
+    const slug = createPostDto.title.split(" ").join('_').toLowerCase();
+    return await this.repo.insert({ ...createPostDto, slug});
   }
 
   async findAll() {
@@ -32,7 +33,7 @@ export class PostService {
     return await this.repo.update(id, updatePostDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(id: number) {
+    return await this.repo.delete(id);
   }
 }
