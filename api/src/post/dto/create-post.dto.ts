@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import { Category } from "src/category/entities/category.entity";
 
 export class CreatePostDto {
@@ -9,6 +9,10 @@ export class CreatePostDto {
     @IsNotEmpty({message: 'Please enter something for content'})
     @IsString()
     content: string;
+
+    @IsNumber()
+    @IsOptional()
+    categoryId: number;
 
     @IsOptional()
     @IsString()

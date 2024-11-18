@@ -72,11 +72,27 @@ export class PostService {
     }
   }
 
-  async update(id: number, updatePostDto: UpdatePostDto) {
-    return await this.repo.update(id, updatePostDto);
+  async update(slug: string, updatePostDto: UpdatePostDto) {
+    const post = await this.repo.findOne({where: { slug }});
+
+    if (!post) {
+      throw new BadRequestException(`Post not found`);
+    }
+    post.modiefiedOn = new Date(Date.now());
+    post.category = updatePostDto.category;
+
+    Object.assign(post, updatePostDto);
+    return this.repo.save(post);
   }
 
   async remove(id: number) {
-    return await this.repo.delete(id);
+    const post = await this.repo.findOne({where: { id }});
+
+    if (!post) {
+      throw new BadRequestException(`Post not found`);
+    }
+
+    await this.repo.remove(post);
+    return {success: true, post};
   }
 }
