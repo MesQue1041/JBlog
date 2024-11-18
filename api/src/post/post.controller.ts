@@ -13,7 +13,8 @@ export class PostController {
     return this.postService.create(createPostDto);
   }
 
-  @Get('findAll')
+  @Get()
+  @UseInterceptors(ClassSerializerInterceptor)
   findAll() {
     return this.postService.findAll();
   }
