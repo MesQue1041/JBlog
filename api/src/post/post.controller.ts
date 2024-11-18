@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, UseInterceptors, ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, UseInterceptors, ClassSerializerInterceptor, ValidationPipe, Req, Query } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { Request } from 'express';
+import { User } from 'src/auth/entities/user.entity';
 
 @Controller('post')
 export class PostController {
@@ -9,19 +11,25 @@ export class PostController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  create(@Body() createPostDto: CreatePostDto) {
-    return this.postService.create(createPostDto);
+  create(@Body() createPostDto: CreatePostDto, @Req() req: Request) {
+      // @ts-ignore: Suppress 'user' does not exist error temporarily
+      return this.postService.create(createPostDto, req.user as User);
   }
 
   @Get()
   @UseInterceptors(ClassSerializerInterceptor)
-  findAll() {
-    return this.postService.findAll();
+  findAll(@Query() query: any) {
+    return this.postService.findAll(query);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.postService.findOne(+id);
+  }
+
+  @Get("/slug/:slug")
+  findBySlug(@Param('slug') slug: string) {
+    return this.postService.findBySlug(slug);
   }
 
   @Patch(':id')

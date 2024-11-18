@@ -53,7 +53,7 @@ export class Post {
 
     @BeforeInsert()
     slugifyPost() {
-        this.slug = slugify(this.title.substring(0, 20), {
+        this.slug = slugify(this.title.substring(0, 20), {    //My New Blog     my-new-blog
             lower: true,
             replacement: '_'
         });   //this is a title of a post 
