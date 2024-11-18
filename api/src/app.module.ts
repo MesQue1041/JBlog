@@ -7,16 +7,16 @@ import { CategoryModule } from './category/category.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [PostModule, TypeOrmModule.forRoot({
-      type: "mysql",
+  imports: [PostModule, CategoryModule, TypeOrmModule.forRoot({
+      type: "postgres",
       host: "localhost",
-      database: "JBlog",
-      username: "root",
-      password: "Abdul@1041",
+      database: "postgres",
+      username: "postgres",
+      password: "12345",
       autoLoadEntities: true,
-      port: 3306,
-      synchronize: false
-    }), CategoryModule, AuthModule],
+      port: 5432,
+      synchronize: true,
+    }),  AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

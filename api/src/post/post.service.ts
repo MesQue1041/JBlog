@@ -13,8 +13,11 @@ export class PostService {
   }
 
   async create(createPostDto: CreatePostDto) {
-    const slug = createPostDto.title.split(" ").join('_').toLowerCase();
-    return await this.repo.insert({ ...createPostDto, slug});
+    //const slug = createPostDto.title.split(" ").join('_').toLowerCase();
+    const post = new Post();
+    post.title = createPostDto.title;
+    
+    return await this.repo.insert({ ...createPostDto});
   }
 
   async findAll() {
