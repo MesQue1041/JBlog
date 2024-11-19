@@ -20,7 +20,7 @@ export class User {
     @Column({select: false})
     password: string;
 
-    @Column()
+    @Column({ default : null})
     profilePic: string;
 
     @OneToMany(() => Post, (post) => post.user)

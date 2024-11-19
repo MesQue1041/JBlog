@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
@@ -41,6 +41,26 @@ export class AuthService {
 
   async verifyPassword(password: string, hash: string) {
     return await bcrypt.compare(password, hash);
+
+  }
+
+  async register(createUserDto : CreateUserDto) {
+    const {email} = createUserDto;
+
+    const checkForUser = await this.repo.findOne({
+      where: { email },
+    });
+
+    if (checkForUser) {
+      throw new BadRequestException('Email is already chosen, please choose a new one');
+    } else {
+      const user = new User();
+      Object.assign(user, createUserDto);
+      this.repo.create(user);
+      await this.repo.save(user);
+      delete user.password;
+      return user;
+    }
 
   }
 }

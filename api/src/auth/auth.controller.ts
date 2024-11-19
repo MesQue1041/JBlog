@@ -22,4 +22,9 @@ export class AuthController {
     return res.send({ sucess: true, user});
   }
 
+  @Post('register')
+  async userRegistration(@Body() userCreateDto: CreateUserDto) {
+    return this.authService.register(userCreateDto);
+  }
+
 }
