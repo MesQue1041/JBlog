@@ -14,6 +14,4 @@ export class Category {
 
     @OneToMany(() => Post, (post)=> post.category)
     post: Post;
-
-
 }

@@ -1,26 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserLoginDto } from './dto/user-login.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcryptjs';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateUserDto) {
-    return 'This action adds a new auth';
-  }
+  constructor(@InjectRepository(User) private readonly repo: Repository<User>, 
+    private jwtService : JwtService) {}
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async login(loginDto : UserLoginDto) {
+    const user = await 
+    this.repo.createQueryBuilder('user')
+    .addSelect('user.password')
+    .where('user.email = :email', { email: loginDto.email}).getOne();
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
 
-  update(id: number, updateAuthDto: UpdateUserDto) {
-    return `This action updates a #${id} auth`;
+    if (!user) {
+      throw new UnauthorizedException('Bad Credentials');
+    } else {
+      // verify that the supplied password hash is matching with the hash in database
+      if (await this.verifyPassword(loginDto.password, user.password)) {
+        const token = this.jwtService.signAsync({
+          email: user.email,
+          id: user.id
+        });
+        delete user.password;
+        return { token, user };
+      }
+      else {
+        throw new UnauthorizedException("Bad Credentials")
+      }
+    }
   }
+  
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async verifyPassword(password: string, hash: string) {
+    return await bcrypt.compare(password, hash);
+
   }
 }
