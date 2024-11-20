@@ -25,7 +25,7 @@ export class AuthService {
     } else {
       // verify that the supplied password hash is matching with the hash in database
       if (await this.verifyPassword(loginDto.password, user.password)) {
-        const token = this.jwtService.signAsync({
+        const token = await this.jwtService.signAsync({
           email: user.email,
           id: user.id
         });
