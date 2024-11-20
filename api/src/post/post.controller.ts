@@ -10,6 +10,7 @@ import { CurrentUserGuard } from 'src/auth/current-user.guard';
 import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { ACGuard, UseRoles } from 'nest-access-control';
 
 @Controller('post')
 export class PostController {
@@ -17,7 +18,12 @@ export class PostController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  @UseRoles({
+    possession: 'any',
+    action: 'create',
+    resource: 'posts'
+  })
   create(@Body() createPostDto: CreatePostDto, @Req() req: Request, @CurrentUser() user: User) {
       // @ts-ignore: Suppress 'user' does not exist error temporarily
       console.log(user);

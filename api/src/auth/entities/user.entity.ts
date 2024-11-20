@@ -2,6 +2,7 @@ import { Post } from "src/post/entities/post.entity";
 import { BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import * as bcrypt from 'bcryptjs';
 import { Exclude } from "class-transformer";
+import { UserRoles } from "../user-roles";
 
 @Entity()
 export class User {
@@ -22,6 +23,9 @@ export class User {
 
     @Column({ default : null})
     profilePic: string;
+
+    @Column({type: 'enum', enum: UserRoles, default: UserRoles.Reader})
+    roles: UserRoles;
 
     @OneToMany(() => Post, (post) => post.user)
     posts: Post[];

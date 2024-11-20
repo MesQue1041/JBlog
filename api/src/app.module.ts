@@ -5,6 +5,8 @@ import { PostModule } from './post/post.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoryModule } from './category/category.module';
 import { AuthModule } from './auth/auth.module';
+import { AccessControlModule } from 'nest-access-control';
+import { roles } from './auth/user-roles';
 
 @Module({
   imports: [PostModule, CategoryModule, TypeOrmModule.forRoot({
@@ -16,7 +18,7 @@ import { AuthModule } from './auth/auth.module';
       autoLoadEntities: true,
       port: 5432,
       synchronize: true,
-    }),  AuthModule],
+    }),  AuthModule, AccessControlModule.forRoles(roles) ],
   controllers: [AppController],
   providers: [AppService],
 })
