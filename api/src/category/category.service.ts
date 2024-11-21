@@ -1,26 +1,54 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { Response } from 'express';
+import { Category } from './entities/category.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class CategoryService {
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+
+  constructor(@InjectRepository(Category) private readonly repo: Repository<Category>) {}
+
+  async create(createCategoryDto: CreateCategoryDto) {
+    const category = new Category;
+    Object.assign(category, createCategoryDto);
+    this.repo.create(category);
+    return await this.repo.save(category);
   }
 
-  findAll() {
-    return `This action returns all category`;
+ async findAll() {
+    return await this.repo.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async findOne(id: number) {
+    return await this.repo.findOne({ where: { id } });
+   }
+
+   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
+    const category = await this.findOne(id);
+
+    if (!category) {
+      throw new BadRequestException('Category not found');
+    }
+    Object.assign(category, updateCategoryDto);
+    return await this.repo.save(category);
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async remove(id: number) {
+    const category = await this.findOne(id);
+  
+    if (!category) {
+      throw new BadRequestException('Category not found');
+    }
+  
+    try {
+      await this.repo.remove(category);
+      return { success: true, category };
+    } catch {
+      throw new BadRequestException('Operation Failed');
+    }
   }
-
-  remove(id: number) {
-    return `This action removes a #${id} category`;
-  }
+  
 }

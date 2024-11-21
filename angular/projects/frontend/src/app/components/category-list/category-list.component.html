@@ -1,1 +1,16 @@
-<p>category-list works!</p>
+<div class="card mb-4">
+    <div class="card-header">Categories</div>
+    <div class="card-body">
+        <div class="row">
+            <ng-container *ngFor="let c of cats">
+                <div class="col-sm-6">
+                    <ul class="list-unstyled mb-0">
+                        <li><a routerLink="/post/category/{{c.title}}">{{c.title}}</a></li>
+                    </ul>
+                </div>
+            </ng-container>
+            
+           
+        </div>
+    </div>
+</div>

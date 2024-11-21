@@ -25,7 +25,6 @@ export class PostController {
     resource: 'posts'
   })
   create(@Body() createPostDto: CreatePostDto, @Req() req: Request, @CurrentUser() user: User) {
-      // @ts-ignore: Suppress 'user' does not exist error temporarily
       console.log(user);
       return this.postService.create(createPostDto, req.user as User);
   }
@@ -49,49 +48,58 @@ export class PostController {
   }
 
   @Post('upload-photo')
-@UseInterceptors(FileInterceptor('file', {
-  storage: diskStorage({
-    destination: './uploads',
-    filename: (req, file, cb) => {
-      const name = file.originalname.split('.')[0]; // Get the name before the first dot
-      const fileExtension = file.originalname.split('.').pop(); // Get the extension after the last dot
-      const newFileName = name.split(" ").join("_") + "_" + Date.now() + "." + fileExtension; // Construct the filename
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './uploads',
+      filename: (req, file, cb) => {
+        const name = file.originalname.split('.')[0]; // Get the name before the first dot
+        const fileExtension = file.originalname.split('.').pop(); // Get the extension after the last dot
+        const newFileName = name.split(" ").join("_") + "_" + Date.now() + "." + fileExtension; // Construct the filename
 
-      cb(null, newFileName); // Pass the new filename to the callback
+        cb(null, newFileName); // Pass the new filename to the callback
+      }
+    }),
+    fileFilter: (req, file, cb) => {
+      if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) { // Allow only specific image formats
+        return cb(new BadRequestException('Only image files are allowed!'), false);
+      }
+      cb(null, true); // Accept the file
     }
-  }),
-  fileFilter: (req, file, cb) => {
-    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) { // Allow only specific image formats
-      return cb(new BadRequestException('Only image files are allowed!'), false);
+  }))
+  uploadPhoto(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('File is not an image');
+    } else {
+      const response = {
+        filepath: `http://localhost:5000/post/pictures/${file.filename}` // Construct the response
+      };
+      return response;
     }
-    cb(null, true); // Accept the file
   }
-}))
-uploadPhoto(@UploadedFile() file: Express.Multer.File) {
-  if (!file) {
-    throw new BadRequestException('File is not an image');
-  } else {
-    const response = {
-      filepath: `http://localhost:5000/post/pictures/${file.filename}` // Construct the response
-    };
-    return response;
-  }
-}
 
   @Get('pictures/:filename')
   async getPicture(@Param('filename') filename, @Res() res: Response){
     res.sendFile(filename, {root: './uploads'});
   }
 
-
   @Patch(":slug")
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), ACGuard) // Ensure both AuthGuard and ACGuard are applied
+  @UseRoles({
+    possession: 'any',
+    action: 'update',
+    resource: 'posts'
+  })
   update(@Param('slug') slug: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postService.update(slug, updatePostDto);
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), ACGuard) // Ensure both AuthGuard and ACGuard are applied
+  @UseRoles({
+    possession: 'any',
+    action: 'delete',
+    resource: 'posts'
+  })
   remove(@Param('id') id: string) {
     return this.postService.remove(+id);
   }
