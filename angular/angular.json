@@ -50,12 +50,13 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "projects/backend/public"
+                "input": "projects/backend/src/assets",
+                "output": "/assets/"
               }
             ],
             "styles": [
-              "projects/backend/src/styles.scss"
-            ],
+              "projects/backend/src/assets/css/styles.css"           
+             ],
             "scripts": [],
             "server": "projects/backend/src/main.server.ts",
             "outputMode": "server",
@@ -118,7 +119,7 @@
               }
             ],
             "styles": [
-              "projects/backend/src/styles.scss"
+              "projects/src/assets/css/styles.scss"
             ],
             "scripts": []
           }
