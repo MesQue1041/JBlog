@@ -7,11 +7,14 @@ import { PostsComponent } from './components/posts/posts.component';
 import { CategoryComponent } from './components/category/category.component';
 import { NewPostComponent } from './components/posts/new-post/new-post.component';
 import { EditPostComponent } from './components/posts/edit-post/edit-post.component';
+import { authGuard } from '../../../tools/src/lib/guards/auth.guard';
+import { adminGuard } from '../../../tools/src/lib/guards/admin.guard';
 
 export const routes: Routes = [
     {
         path: '',
         component: MainComponent,
+        canActivate: [authGuard, adminGuard],
         children: [
             {
                 path: '',
